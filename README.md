@@ -1,3 +1,5 @@
+![pytest](https://github.com/wenaught/notes/actions/workflows/test.yml/badge.svg) ![coverage](https://github.com/wenaught/notes/actions/workflows/coverage.yml/badge.svg)
+
 # Notes
 
 Notes is a sample API for managing todo lists, notes, and such.

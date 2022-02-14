@@ -1,0 +1,85 @@
+# This is a basic workflow to help you get started with Actions
+
+name: coverage
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the development branch
+  push:
+    branches: [ development ]
+  pull_request:
+    branches: [ development ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    env:
+      COVERAGE_SINGLE: 60
+      COVERAGE_TOTAL: 60
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.10"
+
+      - name: pytest with coverage
+        id: pytester-cov
+        uses: alexanderdamiani/pytester-cov@v1.2.3
+        with:
+          # directory with pytest tests
+          pytest-tests-dir: tests
+          # list of directories and/or files to ignore in coverage
+          cov-omit-list: "test/*"
+          # fail if any single file coverage is less than threshold
+          cov-threshold-single: ${{ env.COVERAGE_SINGLE }}
+          # fail if the total coverage is less than threshold
+          cov-threshold-total: ${{ env.COVERAGE_TOTAL }}
+
+      - name: Single file coverage failure - exit
+        if: ${{ steps.pytester-cov.outputs.cov-threshold-single-fail == 'true' }}
+        run: |
+          echo "single file coverage failure"
+          exit 1
+
+      - name: Coverage single file failure - new issue
+        if: ${{ steps.pytester-cov.outputs.cov-threshold-single-fail == 'true' }}
+        uses: nashmaniac/create-issue-action@v1.1
+        with:
+          title: Single file coverage falls below specified minimum of ${{ env.COVERAGE_SINGLE }} percent
+          token: ${{secrets.GITHUB_TOKEN}}
+          assignees: ${{github.actor}}
+          labels: workflow-failed
+          body: ${{ steps.pytester-cov.outputs.output-table }}
+
+      - name: Total coverage failure - new issue
+        if: ${{ steps.pytester-cov.outputs.cov-threshold-total-fail == 'true' }}
+        uses: nashmaniac/create-issue-action@v1.1
+        with:
+          title: Total coverage falls below minimum of ${{ env.COVERAGE_TOTAL }} percent
+          token: ${{secrets.GITHUB_TOKEN}}
+          assignees: ${{github.actor}}
+          labels: workflow-failed
+          body: ${{ steps.pytester-cov.outputs.output-table }}
+
+      - name: Total coverage failure - exit
+        if: ${{ steps.pytester-cov.outputs.cov-threshold-total-fail == 'true' }}
+        run: |
+          echo "total coverage failure"
+          exit 1
+
+      - name: Comment pytest coverage table
+        uses: peter-evans/commit-comment@v1
+        with:
+          body: ${{ steps.pytester-cov.outputs.output-table }}
