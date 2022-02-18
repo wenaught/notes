@@ -5,13 +5,13 @@ on:
   push:
     branches: [ development ]
     paths-ignore:  # ignore paths that don't contain application code
-      - "tests/**"
-      - ".github/**"
+      - "**"
+      - "!notes/**"
   pull_request:
     branches: [ development ]
     paths-ignore:  # ignore paths that don't contain application code
-      - "tests/**"
-      - ".github/**"
+      - "**"
+      - "!notes/**"
 
   # Allow manual job start
   workflow_dispatch:
