@@ -1,21 +1,28 @@
+import os
+
 import flask.testing
 import pytest
+import yaml
 
 import notes
 
+data_file_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "data/notes.yaml")
+test_data = yaml.safe_load(open(data_file_path, 'r'))
 
-@pytest.fixture(scope='session')
+
+@pytest.fixture()
 def app() -> flask.Flask:
-    """Creates a Flask app object instance.
+    """Create a Flask app object instance. Drops the MongoDB database used for testing.
 
     :return: the app instance.
     """
-    return notes.app
+    yield notes.create_app()
+    notes.mongo.cx.drop_database(os.environ["MONGO_URI"].split('/')[-1])
 
 
 @pytest.fixture()
 def client(app: flask.Flask) -> flask.testing.FlaskClient:
-    """Creates a Flask testing client.
+    """Create a Flask testing client.
 
     :param app: Flask application object instance.
     :return: the testing client.

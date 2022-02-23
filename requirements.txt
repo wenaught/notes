@@ -1,2 +1,5 @@
-Flask==2.0.2
+APIFlask==0.11.0
+Flask==2.0.3
+Flask_PyMongo==2.3.0
 pytest==7.0.1
+umongo==3.1.0
