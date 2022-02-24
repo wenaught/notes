@@ -20,6 +20,9 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
+    env:
+      MONGO_URI: "mongodb://localhost:27017/notes_test"
+
     steps:
       - name: Checkout repo
         uses: actions/checkout@v2
@@ -32,5 +35,26 @@ jobs:
       - name: Install requirements
         run: pip install -r requirements.txt
 
-      - name: pytest
-        run: pytest tests
+      - name: Start MongoDB server
+        uses: supercharge/mongodb-github-action@1.7.0
+        with:
+          mongodb-db: notes_test
+
+      - name: pytest with coverage
+        run: pytest tests --html=report.html --self-contained-html --cov-report html:cov_html --cov=notes --cov-fail-under=70
+
+      - name: pytest without coverage
+        if: failure()
+        run: pytest tests --html=report.html --self-contained-html
+
+      - name: Upload test report
+        uses: actions/upload-artifact@v2
+        with:
+          name: report
+          path: report.html
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v2
+        with:
+          name: coverage
+          path: cov_html/

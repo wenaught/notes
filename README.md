@@ -1,4 +1,4 @@
-[![test](https://github.com/wenaught/notes/actions/workflows/test.yml/badge.svg)](https://github.com/wenaught/notes/actions/workflows/test.yml) [![coverage](https://github.com/wenaught/notes/actions/workflows/coverage.yml/badge.svg)](https://github.com/wenaught/notes/actions/workflows/coverage.yml)
+[![test](https://github.com/wenaught/notes/actions/workflows/test.yml/badge.svg)](https://github.com/wenaught/notes/actions/workflows/test.yml)
 
 # Notes
 
