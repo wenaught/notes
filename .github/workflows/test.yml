@@ -41,20 +41,16 @@ jobs:
           mongodb-db: notes_test
 
       - name: pytest with coverage
-        run: pytest tests --html=report.html --self-contained-html --cov-report html:cov_html --cov=notes --cov-fail-under=70
+        run: pytest tests --html=report.html --self-contained-html --cov-report xml --cov=notes
 
-      - name: pytest without coverage
-        if: failure()
-        run: pytest tests --html=report.html --self-contained-html
-
-      - name: Upload test report
+      - name: Upload test report to GitHub
         uses: actions/upload-artifact@v2
         with:
-          name: report
+          name: test_report
           path: report.html
 
-      - name: Upload coverage report
-        uses: actions/upload-artifact@v2
+      - name: Upload test coverage report to Codecov
+        uses: codecov/codecov-action@v2.1.0
         with:
-          name: coverage
-          path: cov_html/
+          file: coverage.xml
+          verbose: true
