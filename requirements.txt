@@ -4,4 +4,5 @@ Flask_PyMongo==2.3.0
 pytest==7.0.1
 pytest-cov==3.0.0
 pytest-html==3.1.1
+PyYAML==6.0
 umongo==3.1.0
