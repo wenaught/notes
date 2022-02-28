@@ -2,31 +2,36 @@ post:
   - &single_contents
     id: single note
     contents:
-      - name: test note
+      - title: test note
         text: test text
   - &multiple_contents
     id: multiple notes
     contents:
-      - name: test 0
+      - title: test 0
         text: test 0
-      - name: test 1
+      - title: test 1
         text: test 1
-      - name: test 2
+      - title: test 2
         text: test 2
-      - name: test 3
+      - title: test 3
         text: test 3
-      - name: test 4
+      - title: test 4
         text: test 4
-      - name: test 5
+      - title: test 5
         text: test 5
-      - name: test 6
+      - title: test 6
         text: test 6
-      - name: test 7
+      - title: test 7
         text: test 7
-      - name: test 8
+      - title: test 8
         text: test 8
-      - name: test 9
+      - title: test 9
         text: test 9
+get_posted:
+  - *single_contents
+  - *multiple_contents
+get_all_posted:
+  - *multiple_contents
 get:
   - *single_contents
   - *multiple_contents

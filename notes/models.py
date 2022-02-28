@@ -2,6 +2,7 @@
 
 from umongo import Document, fields
 from umongo.frameworks import PyMongoInstance
+from marshmallow.validate import Length
 
 instance = PyMongoInstance()
 
@@ -9,14 +10,37 @@ instance = PyMongoInstance()
 @instance.register
 class Note(Document):
     """A MongoDB model for the 'note' document."""
-    name = fields.StrField()
-    added_timestamp = fields.DateTimeField()
-    modified_timestamp = fields.DateTimeField()
-    text = fields.StrField()
+    title = fields.StrField(
+        required=True,
+        metadata={
+            'title': 'Note title',
+            'description': 'Optional title of the note'
+        }
+    )
+    text = fields.StrField(
+        required=True,
+        validate=Length(min=1),
+        metadata={
+            'title': 'Note text',
+            'description': 'Text of the note'
+        }
+    )
+    added_timestamp = fields.DateTimeField(
+        metadata={
+            'title': 'Time of creation',
+            'description': 'Timestamp added to the note at the time of creation'
+        }
+    )
+    modified_timestamp = fields.DateTimeField(
+        metadata={
+            'title': 'Time of last modification',
+            'description': 'Timestamp of the last modification'
+        }
+    )
 
     class Meta:
         collection_name = 'notes'
-        indexes = ('name',)
+        indexes = ('title',)
 
 
 NoteSchema = Note.schema.as_marshmallow_schema()
@@ -26,11 +50,11 @@ class InNoteSchema(NoteSchema):
     """A schema that defines input fields for a 'note' document."""
 
     class Meta:
-        fields = ('name', 'text')
+        fields = ('title', 'text')
 
 
 class OutNoteSchema(NoteSchema):
     """A schema that defines output fields for a 'note' document."""
 
     class Meta:
-        fields = ('name', 'added_timestamp', 'modified_timestamp', 'text')
+        fields = ('title', 'added_timestamp', 'modified_timestamp', 'text')
