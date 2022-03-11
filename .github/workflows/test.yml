@@ -22,6 +22,7 @@ jobs:
 
     env:
       MONGO_URI: "mongodb://localhost:27017/notes_test"
+      MOCK_MONGO: True
 
     steps:
       - name: Checkout repo
@@ -35,10 +36,10 @@ jobs:
       - name: Install requirements
         run: pip install -r requirements.txt
 
-      - name: Start MongoDB server
-        uses: supercharge/mongodb-github-action@1.7.0
-        with:
-          mongodb-db: notes_test
+#      - name: Start MongoDB server
+#        uses: supercharge/mongodb-github-action@1.7.0
+#        with:
+#          mongodb-db: notes_test
 
       - name: Create config file
         run: |

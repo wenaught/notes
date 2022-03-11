@@ -4,12 +4,12 @@ import datetime
 
 from apiflask import APIBlueprint, input, output, doc
 
-from notes.models import Note, InNoteSchema, OutNoteSchema
+from notes.note.models import Note, InNoteSchema, OutNoteSchema
 
-blueprint = APIBlueprint('notes', __name__)
+note_blueprint = APIBlueprint('notes', __name__)
 
 
-@blueprint.post('/notes')
+@note_blueprint.post('/notes')
 @input(InNoteSchema)
 @output(OutNoteSchema,
         201,
@@ -22,16 +22,14 @@ blueprint = APIBlueprint('notes', __name__)
         )
 @doc(tag='Notes', operation_id='postNote')
 def post_note(data: dict) -> Note:
-    """Create a note
-
-    Post a note with given title and text to the API."""
+    """Post a note with given title and text to the API."""
     note = Note(**data)
     note.added_timestamp = note.modified_timestamp = datetime.datetime.now()
     note.commit()
     return note
 
 
-@blueprint.get('/notes/<string:title>')
+@note_blueprint.get('/notes/<string:title>')
 @output(OutNoteSchema)
 @doc(tag='Notes', operation_id='getNote')
 def get_note(title: str) -> Note:
@@ -40,7 +38,7 @@ def get_note(title: str) -> Note:
     return note
 
 
-@blueprint.get('/notes')
+@note_blueprint.get('/notes')
 @output(OutNoteSchema(many=True))
 @doc(tag='Notes')
 def get_notes() -> list[Note]:
