@@ -13,6 +13,7 @@ class Note(Document):
     """A MongoDB model for the 'note' document."""
     title = fields.StrField(
         required=True,
+        validate=Length(min=1, max=20),
         metadata={
             'title': 'Note title',
             'description': 'Optional title of the note'
