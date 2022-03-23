@@ -1,9 +1,9 @@
 """This module defines the models and schemas used by the 'note' entities of the API."""
 import os
 
+from marshmallow.validate import Length
 from umongo import Document, fields
 from umongo.frameworks import PyMongoInstance, MongoMockInstance
-from marshmallow.validate import Length
 
 note_umongo_instance = PyMongoInstance() if not os.getenv("MOCK_MONGO") else MongoMockInstance()
 

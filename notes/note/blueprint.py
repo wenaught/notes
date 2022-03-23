@@ -2,7 +2,7 @@
 
 import datetime
 
-from apiflask import APIBlueprint, input, output, abort, doc
+from apiflask import APIBlueprint, abort
 
 from notes.note.models import Note, InNoteSchema, OutNoteSchema
 
@@ -12,8 +12,8 @@ note_blueprint = APIBlueprint('notes', __name__,
 
 
 @note_blueprint.post('')
-@input(InNoteSchema)
-@output(OutNoteSchema, 201, description="Newly created note")
+@note_blueprint.input(InNoteSchema)
+@note_blueprint.output(OutNoteSchema, 201, description="Newly created note")
 def post_note(data: dict) -> Note:
     """Post a Note
 
@@ -26,8 +26,8 @@ def post_note(data: dict) -> Note:
 
 
 @note_blueprint.get('/<string:title>')
-@output(OutNoteSchema)
-@doc(responses=[200, 404])
+@note_blueprint.output(OutNoteSchema)
+@note_blueprint.doc(responses=[200, 404])
 def get_note(title: str) -> Note:
     """Get a Note
 
@@ -40,7 +40,7 @@ def get_note(title: str) -> Note:
 
 
 @note_blueprint.get('')
-@output(OutNoteSchema(many=True))
+@note_blueprint.output(OutNoteSchema(many=True))
 def get_notes() -> list[Note]:
     """Get All Notes
 
