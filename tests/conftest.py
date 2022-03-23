@@ -7,11 +7,11 @@ import yaml
 from mongomock.mongo_client import MongoClient
 
 import notes
-from notes import Note
+from notes.note.models import Note
 
 data_file_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "data/notes.yaml")
 test_data = yaml.safe_load(open(data_file_path, 'r'))
-endpoint = '/notes'
+endpoint = '/note'
 
 
 class PyMongoMock(MongoClient):
