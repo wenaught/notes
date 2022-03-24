@@ -13,6 +13,7 @@ for storing configuration files. Said files can be written in either JSON or YAM
 
 Example:
 ```yaml
+# OpenAPI configuration values, see https://apiflask.com/configuration/#openapi-fields
 CONTACT:
   name: contact
   email: contact@example.com
@@ -21,15 +22,12 @@ LICENSE:
   url: https://www.mozilla.org/en-US/MPL/2.0/
 DESCRIPTION: |
   A description of the API.
-TAGS:
-  - name: Notes
-    description: Interaction with the notes
-    ...  # don't put an actual ellipsis in a YAML document - it denotes the end of the document!
 SERVERS:
   - name: Development Server
     url: http://localhost:5000
-    ...
-SECRET_KEY: secret key
+
+# Flask app configuration values, see https://flask.palletsprojects.com/en/2.0.x/config/#builtin-configuration-values
+SECRET_KEY: secret
 ```
 
 Following environment variables need to be set:

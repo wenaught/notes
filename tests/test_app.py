@@ -3,7 +3,7 @@ import logging
 import pytest
 from marshmallow import ValidationError
 
-from conftest import test_data, schemas
+from .conftest import test_data, schemas
 
 logger = logging.getLogger(__name__)
 
