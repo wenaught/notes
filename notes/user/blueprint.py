@@ -1,7 +1,7 @@
 """This module defines the /user routes."""
 from apiflask import APIBlueprint, abort
 
-from notes.user.model import User, CreateUserSchema, LoginUserSchema, OutUserSchema, auth
+from notes.user.model import User, InUserSchema, LoginUserSchema, OutUserSchema, auth
 
 user_blueprint = APIBlueprint("user", __name__,
                               url_prefix="/user",
@@ -9,13 +9,12 @@ user_blueprint = APIBlueprint("user", __name__,
 
 
 @user_blueprint.post("")
-@user_blueprint.input(CreateUserSchema,
+@user_blueprint.input(InUserSchema,
                       example={"email": "email@example.com",
                                "username": "username",
-                               "password": "secure_P4ss"}
-                      )
+                               "password": "secure_P4ss"})
 @user_blueprint.output(OutUserSchema, 201, description="Newly created user")
-def create_user(data: dict) -> User:
+def post_user(data: dict) -> User:
     """Create a User
 
     Create a new user.
@@ -26,8 +25,14 @@ def create_user(data: dict) -> User:
 
 
 @user_blueprint.post("/login")
-@user_blueprint.input(LoginUserSchema, example={"username": "username", "password": "secure_P4ss"})
-@user_blueprint.output(OutUserSchema, description="User that just logged in")
+@user_blueprint.input(LoginUserSchema,
+                      example={"username": "username",
+                               "password": "secure_P4ss"})
+@user_blueprint.output(OutUserSchema,
+                       example={"username": "username",
+                                "email": "email@example.com",
+                                "token": "long complicated string"},
+                       description="User that just logged in")
 @user_blueprint.doc(responses=[200, 401])
 def login(data: dict) -> User:
     """Log in
@@ -42,7 +47,11 @@ def login(data: dict) -> User:
 
 @user_blueprint.get("")
 @user_blueprint.auth_required(auth)
-@user_blueprint.output(OutUserSchema, description="User currently logged in")
+@user_blueprint.output(OutUserSchema,
+                       example={"username": "username",
+                                "email": "email@example.com",
+                                "token": "long complicated string"},
+                       description="User currently logged in")
 @user_blueprint.doc(responses=[200, 401])
 def get_user() -> User:
     """Get Current User
@@ -50,3 +59,37 @@ def get_user() -> User:
     Get details of a user that's currently logged in.
     """
     return auth.current_user
+
+
+@user_blueprint.put("")
+@user_blueprint.auth_required(auth)
+@user_blueprint.input(InUserSchema(partial=True),
+                      example={"email": "updated@example.com",
+                               "username": "updated",
+                               "password": "updated_secure_P4ss"})
+@user_blueprint.output(OutUserSchema,
+                       example={"username": "username",
+                                "email": "email@example.com",
+                                "token": "long complicated string"},
+                       description="Updated user details")
+@user_blueprint.doc(responses=[200, 401])
+def put_user(data: dict) -> User:
+    """Update Current User
+
+    Update details of a user that's currently logged in.
+    """
+    auth.current_user.update(data)
+    auth.current_user.commit()
+    return auth.current_user
+
+
+@user_blueprint.delete("")
+@user_blueprint.auth_required(auth)
+@user_blueprint.output({}, 204)
+@user_blueprint.doc(responses=[200, 401])
+def delete_user() -> None:
+    """Delete Current User
+
+    Delete the user that's currently logged in.
+    """
+    auth.current_user.delete()

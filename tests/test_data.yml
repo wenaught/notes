@@ -25,6 +25,10 @@ users:
   user_invalid_login: &user_invalid_login
     username: *invalid_username
     password: *invalid_password
+  user_update: &user_update
+    username: updated
+    email: updated@example.com
+    password: updatedP4s$
 notes:
   note_invalid_all: &note_invalid_all
     title: &invalid_title ""
@@ -39,8 +43,8 @@ notes:
     title: *valid_title
     text: *valid_text
   note_update: &note_update
-    title: &updated_title updated
-    text: &updated_text updated
+    title: updated
+    text: updated
 test_cases:
   - id: index redirect
     requests:
@@ -140,6 +144,41 @@ test_cases:
         method: get
         code: 401
         response_schema: http_error
+  - id: put user - unauthorized
+    requests:
+      - endpoint: *user_endpoint
+        method: put
+        data: *user_valid_all
+        code: 401
+        response_schema: http_error
+  - id: delete user - unauthorized
+    requests:
+      - endpoint: *user_endpoint
+        method: delete
+        code: 401
+        response_schema: http_error
+  - id: put user - invalid all
+    default_user: true
+    requests:
+      - endpoint: *user_endpoint
+        method: put
+        data: *user_invalid_all
+        code: 400
+        response_schema: verification_failed
+  - id: put user
+    default_user: true
+    requests:
+      - endpoint: *user_endpoint
+        method: put
+        data: *user_update
+        code: 200
+        response_schema: user_out
+  - id: delete user
+    default_user: true
+    requests:
+      - endpoint: *user_endpoint
+        method: delete
+        code: 204
   - id: create note - unauthorized
     requests:
       - endpoint: &note_endpoint /note
@@ -199,6 +238,14 @@ test_cases:
         method: delete
         code: 404
         response_schema: http_error
+  - id: create invalid note - all
+    default_user: true
+    requests:
+      - endpoint: *note_endpoint
+        method: post
+        data: *note_invalid_all
+        code: 400
+        response_schema: verification_failed
   - id: create invalid note - title
     default_user: true
     requests:
@@ -240,6 +287,15 @@ test_cases:
         method: get
         code: 200
         response_schema: note_out
+  - id: put note - invalid all
+    default_user: true
+    default_note: true
+    requests:
+      - endpoint: *title_endpoint
+        method: put
+        data: *note_invalid_all
+        code: 400
+        response_schema: verification_failed
   - id: put note
     default_user: true
     default_note: true
@@ -284,5 +340,14 @@ test_cases:
         code: 200
         response_schema: note_out
       - endpoint: /note/updated
+        method: delete
+        code: 204
+      - endpoint: *user_endpoint
+        method: put
+        data: *user_update
+        code: 200
+        keep_token: true
+        response_schema: user_out
+      - endpoint: *user_endpoint
         method: delete
         code: 204

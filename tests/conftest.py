@@ -11,7 +11,7 @@ from mongomock.mongo_client import MongoClient
 
 import notes
 from notes.note.model import OutNoteSchema, Note
-from notes.user.model import OutUserSchema, User, CreateUserSchema
+from notes.user.model import OutUserSchema, User, InUserSchema
 
 logger = logging.getLogger(__name__)
 
@@ -58,7 +58,7 @@ def default_user(app, request):
     user_data = test_data["users"]["user_valid_all"]
     with app.app_context():
         logger.info("creating default user in database")
-        user = User(**CreateUserSchema().load(user_data))
+        user = User(**InUserSchema().load(user_data))
         user.commit()
         return OutUserSchema().dump(user)
 

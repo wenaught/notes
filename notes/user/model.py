@@ -52,7 +52,7 @@ class User(Document):
 UserSchema = User.schema.as_marshmallow_schema()
 
 
-class CreateUserSchema(UserSchema):
+class InUserSchema(UserSchema):
     """A schema that defines input fields for a new 'user' document."""
     password = fields.StrField(
         required=True,

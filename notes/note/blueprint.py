@@ -28,7 +28,7 @@ def post_note(data: dict) -> Note:
 
 @note_blueprint.get("/<string:title>")
 @note_blueprint.auth_required(auth)
-@note_blueprint.output(OutNoteSchema)
+@note_blueprint.output(OutNoteSchema, description="Fetched note")
 @note_blueprint.doc(responses=[200, 404])
 def get_note(title: str) -> Note:
     """Get a Note
@@ -45,7 +45,7 @@ def get_note(title: str) -> Note:
 @note_blueprint.put("/<string:title>")
 @note_blueprint.auth_required(auth)
 @note_blueprint.input(InNoteSchema(partial=True, update=True))
-@note_blueprint.output(OutNoteSchema)
+@note_blueprint.output(OutNoteSchema, description="Updated note")
 @note_blueprint.doc(responses=[200, 404])
 def put_note(title: str, data: dict) -> Note:
     """Update a Note
@@ -64,7 +64,7 @@ def put_note(title: str, data: dict) -> Note:
 
 @note_blueprint.delete("/<string:title>")
 @note_blueprint.auth_required(auth)
-@note_blueprint.output({}, 204)
+@note_blueprint.output({}, 204, description="Successful deletion response")
 @note_blueprint.doc(responses=[204, 404])
 def delete_note(title: str) -> None:
     """Delete a Note
@@ -81,7 +81,7 @@ def delete_note(title: str) -> None:
 @note_blueprint.get("")
 @note_blueprint.auth_required(auth)
 @note_blueprint.input(QueryNoteSchema, location="query")
-@note_blueprint.output(OutNoteSchema(many=True))
+@note_blueprint.output(OutNoteSchema(many=True), description="List of fetched notes")
 def get_notes(query: dict) -> list[Note]:
     """Get All Notes
 
