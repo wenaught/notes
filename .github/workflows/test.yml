@@ -44,7 +44,7 @@ jobs:
       - name: Create config file
         run: |
           mkdir instance
-          echo '' > instance/test.yaml
+          echo 'SECRET_KEY: secret' > instance/test.yaml
 
       - name: pytest with coverage
         run: pytest tests --html=report.html --self-contained-html --cov-report xml --cov=notes
