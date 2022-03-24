@@ -19,6 +19,12 @@ users:
     username: *valid_username
     email: *valid_email
     password: *valid_password
+  user_login: &user_login
+    username: *valid_username
+    password: *valid_password
+  user_invalid_login: &user_invalid_login
+    username: *invalid_username
+    password: *invalid_password
 notes:
   note_invalid_all: &note_invalid_all
     title: &invalid_title ""
@@ -32,7 +38,15 @@ notes:
   note_valid_all: &note_valid_all
     title: *valid_title
     text: *valid_text
+  note_update: &note_update
+    title: &updated_title updated
+    text: &updated_text updated
 test_cases:
+  - id: index redirect
+    requests:
+      - endpoint: /
+        method: get
+        code: 302
   - id: create invalid user - all
     requests:
       - endpoint: &user_endpoint /user
@@ -80,6 +94,46 @@ test_cases:
         method: get
         code: 200
         response_schema: user_out
+  - id: create, login and get user
+    requests:
+      - endpoint: *user_endpoint
+        method: post
+        data: *user_valid_all
+        code: 201
+        response_schema: user_out
+      - endpoint: /user/login
+        method: post
+        data: *user_login
+        code: 200
+        keep_token: true
+        response_schema: user_out
+      - endpoint: *user_endpoint
+        method: get
+        code: 200
+        response_schema: user_out
+  - id: login and get user
+    default_user: true
+    requests:
+      - endpoint: /user/login
+        method: post
+        data: *user_login
+        code: 200
+        response_schema: user_out
+        no_default_token: true
+        keep_token: true
+      - endpoint: *user_endpoint
+        method: get
+        code: 200
+        response_schema: user_out
+        no_default_token: true
+  - id: login with wrong credentials
+    default_user: true
+    requests:
+      - endpoint: /user/login
+        method: post
+        data: *user_invalid_login
+        code: 401
+        response_schema: verification_failed
   - id: get user - unauthorized
     requests:
       - endpoint: *user_endpoint
@@ -169,3 +223,66 @@ test_cases:
         data: *note_valid_all
         code: 201
         response_schema: note_out
+  - id: create note - duplicate
+    default_user: true
+    default_note: true
+    requests:
+      - endpoint: *note_endpoint
+        method: post
+        data: *note_valid_all
+        code: 400
+        response_schema: verification_failed
+  - id: get note
+    default_user: true
+    default_note: true
+    requests:
+      - endpoint: *title_endpoint
+        method: get
+        code: 200
+        response_schema: note_out
+  - id: put note
+    default_user: true
+    default_note: true
+    requests:
+      - endpoint: *title_endpoint
+        method: put
+        data: *note_update
+        code: 200
+        response_schema: note_out
+  - id: delete note
+    default_user: true
+    default_note: true
+    requests:
+      - endpoint: *title_endpoint
+        method: delete
+        code: 204
+  - id: end-to-end
+    requests:
+      - endpoint: *user_endpoint
+        method: post
+        data: *user_valid_all
+        code: 201
+        response_schema: user_out
+      - endpoint: /user/login
+        method: post
+        data: *user_login
+        code: 200
+        keep_token: true
+        response_schema: user_out
+      - endpoint: *note_endpoint
+        method: post
+        data: *note_valid_all
+        code: 201
+        response_schema: note_out
+      - endpoint: *title_endpoint
+        method: get
+        code: 200
+        response_schema: note_out
+      - endpoint: *title_endpoint
+        method: put
+        data: *note_update
+        code: 200
+        response_schema: note_out
+      - endpoint: /note/updated
+        method: delete
+        code: 204

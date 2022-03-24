@@ -89,6 +89,13 @@ class CreateUserSchema(UserSchema):
 
 class LoginUserSchema(UserSchema):
     """A schema that defines input fields for a user logging in."""
+    username: str = fields.StrField(
+        required=True,
+        metadata={
+            "title": "Username",
+            "description": "Username used to log in"
+        }
+    )
     password = fields.StrField(
         required=True,
         metadata={

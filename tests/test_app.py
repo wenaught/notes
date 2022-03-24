@@ -7,13 +7,15 @@ from .conftest import test_data, schemas
 
 logger = logging.getLogger(__name__)
 
-@pytest.mark.parametrize("test_case,default_user",
-                         zip(test_data["test_cases"], [case.get('default_user') for case in test_data["test_cases"]]),
+@pytest.mark.parametrize("test_case,default_user,default_note",
+                         zip(test_data["test_cases"],
+                             [case.get('default_user') for case in test_data["test_cases"]],
+                             [case.get('default_note') for case in test_data["test_cases"]]),
                          ids=[case["id"] for case in test_data["test_cases"]],
-                         indirect=["default_user"])
-def test_app(client, test_case, default_user):
+                         indirect=["default_user", "default_note"])
+def test_app(client, test_case, default_user, default_note):
     headers = {}
-    if default_user:
+    if default_user and not test_case.get("no_default_token"):
         headers["Authorization"] = f"Bearer {default_user['token']}"
     for request in test_case['requests']:
         logger.info(request['method'] + ' request to ' + request['endpoint'])
