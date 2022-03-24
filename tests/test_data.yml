@@ -1,0 +1,171 @@
+users:
+  user_invalid_all: &user_invalid_all
+    username: &invalid_username u
+    email: &invalid_email e
+    password: &invalid_password p
+  user_invalid_username: &user_invalid_username
+    username: *invalid_username
+    email: &valid_email email@example.com
+    password: &valid_password Secure_p4s$
+  user_invalid_email: &user_invalid_email
+    username: &valid_username username
+    email: *invalid_email
+    password: *valid_password
+  user_invalid_password: &user_invalid_password
+    username: *valid_username
+    email: *valid_email
+    password: *invalid_password
+  user_valid_all: &user_valid_all
+    username: *valid_username
+    email: *valid_email
+    password: *valid_password
+notes:
+  note_invalid_all: &note_invalid_all
+    title: &invalid_title ""
+    text: &invalid_text ""
+  note_invalid_title: &note_invalid_title
+    title: *invalid_title
+    text: &valid_text text
+  note_invalid_text: &note_invalid_text
+    title: &valid_title title
+    text: *invalid_text
+  note_valid_all: &note_valid_all
+    title: *valid_title
+    text: *valid_text
+test_cases:
+  - id: create invalid user - all
+    requests:
+      - endpoint: &user_endpoint /user
+        method: post
+        data: *user_invalid_all
+        code: 400
+        response_schema: verification_failed
+  - id: create invalid user - password
+    requests:
+      - endpoint: *user_endpoint
+        method: post
+        data: *user_invalid_password
+        code: 400
+        response_schema: verification_failed
+  - id: create invalid user - email
+    requests:
+      - endpoint: *user_endpoint
+        method: post
+        data: *user_invalid_email
+        code: 400
+        response_schema: verification_failed
+  - id: create invalid user - username
+    requests:
+      - endpoint: *user_endpoint
+        method: post
+        data: *user_invalid_username
+        code: 400
+        response_schema: verification_failed
+  - id: create valid user
+    requests:
+      - endpoint: *user_endpoint
+        method: post
+        data: *user_valid_all
+        code: 201
+        response_schema: user_out
+  - id: create and get user
+    requests:
+      - endpoint: *user_endpoint
+        method: post
+        data: *user_valid_all
+        code: 201
+        keep_token: true
+        response_schema: user_out
+      - endpoint: *user_endpoint
+        method: get
+        code: 200
+        response_schema: user_out
+  - id: get user - unauthorized
+    requests:
+      - endpoint: *user_endpoint
+        method: get
+        code: 401
+        response_schema: http_error
+  - id: create note - unauthorized
+    requests:
+      - endpoint: &note_endpoint /note
+        method: post
+        data: *note_valid_all
+        code: 401
+        response_schema: http_error
+  - id: get note - unauthorized
+    requests:
+      - endpoint: &title_endpoint /note/title
+        method: get
+        code: 401
+        response_schema: http_error
+  - id: put note - unauthorized
+    requests:
+      - endpoint: *title_endpoint
+        method: put
+        code: 401
+        response_schema: http_error
+  - id: delete note - unauthorized
+    requests:
+      - endpoint: *title_endpoint
+        method: delete
+        code: 401
+        response_schema: http_error
+  - id: get all notes - unauthorized
+    requests:
+      - endpoint: *note_endpoint
+        method: get
+        code: 401
+        response_schema: http_error
+  - id: get all notes
+    default_user: true
+    requests:
+      - endpoint: *note_endpoint
+        method: get
+        code: 200
+        response_schema: many_note_out
+  - id: get note - non-existent
+    default_user: true
+    requests:
+      - endpoint: *title_endpoint
+        method: get
+        code: 404
+        response_schema: http_error
+  - id: put note - non-existent
+    default_user: true
+    requests:
+      - endpoint: *title_endpoint
+        method: put
+        code: 404
+        response_schema: http_error
+  - id: delete note - non-existent
+    default_user: true
+    requests:
+      - endpoint: *title_endpoint
+        method: delete
+        code: 404
+        response_schema: http_error
+  - id: create invalid note - title
+    default_user: true
+    requests:
+      - endpoint: *note_endpoint
+        method: post
+        data: *note_invalid_title
+        code: 400
+        response_schema: verification_failed
+  - id: create invalid note - text
+    default_user: true
+    requests:
+      - endpoint: *note_endpoint
+        method: post
+        data: *note_invalid_text
+        code: 400
+        response_schema: verification_failed
+  - id: create note
+    default_user: true
+    requests:
+      - endpoint: *note_endpoint
+        method: post
+        data: *note_valid_all
+        code: 201
+        response_schema: note_out
