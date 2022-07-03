@@ -14,13 +14,19 @@ from werkzeug.security import generate_password_hash, check_password_hash
 user_umongo_instance = PyMongoInstance() if not os.getenv("MOCK_MONGO") else MongoMockInstance()
 
 
+def unique_username(username: str) -> None:
+    user = User.find_one({"username": username})
+    if user:
+        raise ValidationError("Username already exists")
+
+
 @user_umongo_instance.register
 class User(Document):
     """A MongoDB model for the 'user' document."""
     username: str = fields.StrField(
         required=True,
         unique=True,
-        validate=Length(min=5, max=15),
+        validate=[Length(min=5, max=15), unique_username],
         metadata={
             "title": "Username",
             "description": "Username used to log in"
